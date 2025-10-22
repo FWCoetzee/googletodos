@@ -1,0 +1,118 @@
+import { useState, useEffect } from 'react';
+import { TodoInput } from '@/components/TodoInput';
+import { TodoList } from '@/components/TodoList';
+import { FilterBar } from '@/components/FilterBar';
+import { CheckSquare } from 'lucide-react';
+
+const Index = () => {
+  const [todos, setTodos] = useState([]);
+  const [filter, setFilter] = useState('all');
+
+  // Load todos from localStorage on mount
+  useEffect(() => {
+    const savedTodos = localStorage.getItem('todos');
+    if (savedTodos) {
+      setTodos(JSON.parse(savedTodos));
+    }
+  }, []);
+
+  // Save todos to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
+
+  const addTodo = (task) => {
+    const newTodo = {
+      id: Date.now().toString(),
+      task,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    };
+    setTodos([newTodo, ...todos]);
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const deleteTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const editTodo = (id, newTask) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, task: newTask } : todo
+      )
+    );
+  };
+
+  const getFilteredTodos = () => {
+    switch (filter) {
+      case 'active':
+        return todos.filter((todo) => !todo.completed);
+      case 'completed':
+        return todos.filter((todo) => todo.completed);
+      default:
+        return todos;
+    }
+  };
+
+  const stats = {
+    total: todos.length,
+    active: todos.filter((todo) => !todo.completed).length,
+    completed: todos.filter((todo) => todo.completed).length,
+  };
+
+  const filteredTodos = getFilteredTodos();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
+      <div className="container max-w-3xl mx-auto px-4 py-12">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-glow mb-4">
+            <CheckSquare className="h-8 w-8 text-primary-foreground" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Todo List
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Stay organized and get things done
+          </p>
+        </div>
+
+        {/* Main Content */}
+        <div className="bg-card/50 backdrop-blur-sm rounded-2xl shadow-lg border border-border p-6 md:p-8">
+          <TodoInput onAdd={addTodo} />
+          
+          {todos.length > 0 && (
+            <FilterBar
+              currentFilter={filter}
+              onFilterChange={setFilter}
+              stats={stats}
+            />
+          )}
+
+          <TodoList
+            todos={filteredTodos}
+            onToggle={toggleTodo}
+            onDelete={deleteTodo}
+            onEdit={editTodo}
+          />
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-8 text-sm text-muted-foreground">
+          <p>Built with React, Tailwind CSS, and Framer Motion</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Index;
