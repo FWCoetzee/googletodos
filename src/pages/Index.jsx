@@ -1,55 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { TodoInput } from '@/components/TodoInput';
 import { TodoList } from '@/components/TodoList';
 import { FilterBar } from '@/components/FilterBar';
-import { CheckSquare } from 'lucide-react';
+import { CheckSquare, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTodos } from '@/hooks/useTodos';
 
 const Index = () => {
-  const [todos, setTodos] = useState([]);
   const [filter, setFilter] = useState('all');
-
-  // Load todos from localStorage on mount
-  useEffect(() => {
-    const savedTodos = localStorage.getItem('todos');
-    if (savedTodos) {
-      setTodos(JSON.parse(savedTodos));
-    }
-  }, []);
-
-  // Save todos to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('todos', JSON.stringify(todos));
-  }, [todos]);
-
-  const addTodo = (task) => {
-    const newTodo = {
-      id: Date.now().toString(),
-      task,
-      completed: false,
-      createdAt: new Date().toISOString(),
-    };
-    setTodos([newTodo, ...todos]);
-  };
-
-  const toggleTodo = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
-
-  const deleteTodo = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-  };
-
-  const editTodo = (id, newTask) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, task: newTask } : todo
-      )
-    );
-  };
+  const { user, signOut } = useAuth();
+  const { todos, loading, addTodo, toggleTodo, deleteTodo, editTodo } = useTodos();
 
   const getFilteredTodos = () => {
     switch (filter) {
@@ -75,11 +36,25 @@ const Index = () => {
       <div className="container max-w-3xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
+          <div className="flex justify-end mb-4">
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground">{user?.email}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={signOut}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          </div>
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-glow mb-4">
             <CheckSquare className="h-8 w-8 text-primary-foreground" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Todo List
+            My Todo List
           </h1>
           <p className="text-muted-foreground text-lg">
             Stay organized and get things done
@@ -98,12 +73,18 @@ const Index = () => {
             />
           )}
 
-          <TodoList
-            todos={filteredTodos}
-            onToggle={toggleTodo}
-            onDelete={deleteTodo}
-            onEdit={editTodo}
-          />
+{loading ? (
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            </div>
+          ) : (
+            <TodoList
+              todos={filteredTodos}
+              onToggle={toggleTodo}
+              onDelete={deleteTodo}
+              onEdit={editTodo}
+            />
+          )}
         </div>
 
         {/* Footer */}
