@@ -18,6 +18,7 @@ export const useTodos = () => {
       const { data, error } = await supabase
         .from('todos')
         .select('*')
+        .order('position', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -129,6 +130,39 @@ export const useTodos = () => {
     }
   };
 
+  const reorderTodos = async (oldIndex, newIndex) => {
+    const reorderedTodos = Array.from(todos);
+    const [movedTodo] = reorderedTodos.splice(oldIndex, 1);
+    reorderedTodos.splice(newIndex, 0, movedTodo);
+
+    // Optimistically update the UI
+    setTodos(reorderedTodos);
+
+    try {
+      // Update positions in database
+      const updates = reorderedTodos.map((todo, index) => ({
+        id: todo.id,
+        position: index,
+      }));
+
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('todos')
+          .update({ position: update.position })
+          .eq('id', update.id);
+
+        if (error) throw error;
+      }
+    } catch (error) {
+      toast.error('Failed to reorder tasks');
+      if (import.meta.env.DEV) {
+        console.error('Error reordering todos:', error);
+      }
+      // Revert on error
+      fetchTodos();
+    }
+  };
+
   return {
     todos,
     loading,
@@ -136,5 +170,6 @@ export const useTodos = () => {
     toggleTodo,
     deleteTodo,
     editTodo,
+    reorderTodos,
   };
 };

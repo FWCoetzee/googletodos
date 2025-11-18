@@ -11,7 +11,7 @@ import { PageTransition } from '@/components/PageTransition';
 const Index = () => {
   const [filter, setFilter] = useState('all');
   const { user, signOut } = useAuth();
-  const { todos, loading, addTodo, toggleTodo, deleteTodo, editTodo } = useTodos();
+  const { todos, loading, addTodo, toggleTodo, deleteTodo, editTodo, reorderTodos } = useTodos();
 
   const getFilteredTodos = () => {
     switch (filter) {
@@ -84,7 +84,8 @@ const Index = () => {
                 todos={filteredTodos}
                 onToggle={toggleTodo}
                 onDelete={deleteTodo}
-                onEdit={editTodo}
+                onEdit={onEdit}
+                onReorder={reorderTodos}
               />
             )}
           </div>
