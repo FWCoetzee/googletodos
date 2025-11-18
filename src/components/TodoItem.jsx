@@ -1,14 +1,31 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Trash2, Edit2, X } from 'lucide-react';
+import { Check, Trash2, Edit2, X, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { todoSchema } from '@/lib/validations';
 import { toast } from 'sonner';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.task);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: todo.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   const handleEdit = () => {
     const result = todoSchema.safeParse({ task: editText.trim() });
@@ -33,6 +50,8 @@ export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
 
   return (
     <motion.div
+      ref={setNodeRef}
+      style={style}
       layout
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -41,6 +60,13 @@ export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
       className="group bg-card rounded-xl p-4 shadow-sm border border-border hover:shadow-md transition-all"
     >
       <div className="flex items-center gap-3">
+        <button
+          {...attributes}
+          {...listeners}
+          className="flex-shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <GripVertical className="h-5 w-5" />
+        </button>
         <button
           onClick={() => onToggle(todo.id)}
           className={`flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
