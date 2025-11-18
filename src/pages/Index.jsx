@@ -80,13 +80,13 @@ const Index = () => {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
               </div>
             ) : (
-              <TodoList
-                todos={filteredTodos}
-                onToggle={toggleTodo}
-                onDelete={deleteTodo}
-                onEdit={onEdit}
-                onReorder={reorderTodos}
-              />
+            <TodoList
+              todos={filteredTodos}
+              onToggle={toggleTodo}
+              onDelete={deleteTodo}
+              onEdit={editTodo}
+              onReorder={reorderTodos}
+            />
             )}
           </div>
 
