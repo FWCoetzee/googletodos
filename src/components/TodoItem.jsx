@@ -3,14 +3,24 @@ import { motion } from 'framer-motion';
 import { Check, Trash2, Edit2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { todoSchema } from '@/lib/validations';
+import { toast } from 'sonner';
 
 export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.task);
 
   const handleEdit = () => {
-    if (editText.trim() && editText !== todo.task) {
-      onEdit(todo.id, editText.trim());
+    const result = todoSchema.safeParse({ task: editText.trim() });
+    
+    if (!result.success) {
+      const errorMessage = result.error.errors[0]?.message || 'Invalid input';
+      toast.error(errorMessage);
+      return;
+    }
+    
+    if (result.data.task !== todo.task) {
+      onEdit(todo.id, result.data.task);
     }
     setIsEditing(false);
     setEditText(todo.task);

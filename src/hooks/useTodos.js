@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { todoSchema } from '@/lib/validations';
 
 export const useTodos = () => {
   const [todos, setTodos] = useState([]);
@@ -23,7 +24,9 @@ export const useTodos = () => {
       setTodos(data || []);
     } catch (error) {
       toast.error('Failed to load todos');
-      console.error('Error fetching todos:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error fetching todos:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -38,10 +41,18 @@ export const useTodos = () => {
   const addTodo = async (task) => {
     if (!user) return;
 
+    // Server-side validation
+    const result = todoSchema.safeParse({ task });
+    if (!result.success) {
+      const errorMessage = result.error.errors[0]?.message || 'Invalid task';
+      toast.error(errorMessage);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('todos')
-        .insert([{ task, user_id: user.id, completed: false }])
+        .insert([{ task: result.data.task, user_id: user.id, completed: false }])
         .select()
         .single();
 
@@ -50,7 +61,9 @@ export const useTodos = () => {
       toast.success('Task added!');
     } catch (error) {
       toast.error('Failed to add task');
-      console.error('Error adding todo:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error adding todo:', error);
+      }
     }
   };
 
@@ -66,7 +79,9 @@ export const useTodos = () => {
       setTodos(todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
     } catch (error) {
       toast.error('Failed to update task');
-      console.error('Error toggling todo:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error toggling todo:', error);
+      }
     }
   };
 
@@ -82,23 +97,35 @@ export const useTodos = () => {
       toast.success('Task deleted!');
     } catch (error) {
       toast.error('Failed to delete task');
-      console.error('Error deleting todo:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error deleting todo:', error);
+      }
     }
   };
 
   const editTodo = async (id, newTask) => {
+    // Server-side validation
+    const result = todoSchema.safeParse({ task: newTask });
+    if (!result.success) {
+      const errorMessage = result.error.errors[0]?.message || 'Invalid task';
+      toast.error(errorMessage);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('todos')
-        .update({ task: newTask })
+        .update({ task: result.data.task })
         .eq('id', id);
 
       if (error) throw error;
-      setTodos(todos.map(t => t.id === id ? { ...t, task: newTask } : t));
+      setTodos(todos.map(t => t.id === id ? { ...t, task: result.data.task } : t));
       toast.success('Task updated!');
     } catch (error) {
       toast.error('Failed to update task');
-      console.error('Error editing todo:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error editing todo:', error);
+      }
     }
   };
 

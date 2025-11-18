@@ -2,16 +2,25 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { todoSchema } from '@/lib/validations';
+import { toast } from 'sonner';
 
 export const TodoInput = ({ onAdd }) => {
   const [task, setTask] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (task.trim()) {
-      onAdd(task.trim());
-      setTask('');
+    
+    const result = todoSchema.safeParse({ task: task.trim() });
+    
+    if (!result.success) {
+      const errorMessage = result.error.errors[0]?.message || 'Invalid input';
+      toast.error(errorMessage);
+      return;
     }
+    
+    onAdd(result.data.task);
+    setTask('');
   };
 
   return (
