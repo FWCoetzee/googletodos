@@ -24,10 +24,10 @@ export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       className="group bg-card rounded-xl p-4 shadow-sm border border-border hover:shadow-md transition-all"
     >
       <div className="flex items-center gap-3">

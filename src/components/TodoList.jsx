@@ -17,7 +17,18 @@ export const TodoList = ({ todos, onToggle, onDelete, onEdit }) => {
   }
 
   return (
-    <div className="space-y-3">
+    <motion.div 
+      className="space-y-3"
+      initial="hidden"
+      animate="visible"
+      variants={{
+        visible: {
+          transition: {
+            staggerChildren: 0.1
+          }
+        }
+      }}
+    >
       <AnimatePresence mode="popLayout">
         {todos.map((todo) => (
           <TodoItem
@@ -29,6 +40,6 @@ export const TodoList = ({ todos, onToggle, onDelete, onEdit }) => {
           />
         ))}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
