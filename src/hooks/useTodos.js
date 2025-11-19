@@ -18,7 +18,6 @@ export const useTodos = () => {
       const { data, error } = await supabase
         .from('todos')
         .select('*')
-        .order('position', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
