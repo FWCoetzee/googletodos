@@ -19,27 +19,27 @@ const Index = () => {
   const { todos, loading, addTodo, toggleTodo, deleteTodo, editTodo, reorderTodos } = useTodos();
 
   useEffect(() => {
-    if (user) {
-      loadAvatar();
-    }
-  }, [user]);
+    const loadAvatar = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', user.id)
+          .maybeSingle();
 
-  const loadAvatar = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('avatar_url')
-        .eq('id', user?.id)
-        .single();
-
-      if (error) throw error;
-      if (data) {
-        setAvatarUrl(data.avatar_url);
+        if (error) throw error;
+        if (data) {
+          setAvatarUrl(data.avatar_url);
+        }
+      } catch (error) {
+        console.error('Error loading avatar:', error.message);
       }
-    } catch (error) {
-      console.error('Error loading avatar:', error.message);
-    }
-  };
+    };
+
+    loadAvatar();
+  }, [user]);
 
   const getFilteredTodos = () => {
     switch (filter) {
