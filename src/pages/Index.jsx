@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TodoInput } from '@/components/TodoInput';
 import { TodoList } from '@/components/TodoList';
 import { FilterBar } from '@/components/FilterBar';
@@ -6,14 +6,40 @@ import { Profile } from '@/components/Profile';
 import { CheckSquare, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTodos } from '@/hooks/useTodos';
 import { PageTransition } from '@/components/PageTransition';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [filter, setFilter] = useState('all');
+  const [avatarUrl, setAvatarUrl] = useState(null);
   const { user, signOut } = useAuth();
   const { todos, loading, addTodo, toggleTodo, deleteTodo, editTodo, reorderTodos } = useTodos();
+
+  useEffect(() => {
+    if (user) {
+      loadAvatar();
+    }
+  }, [user]);
+
+  const loadAvatar = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user?.id)
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setAvatarUrl(data.avatar_url);
+      }
+    } catch (error) {
+      console.error('Error loading avatar:', error.message);
+    }
+  };
 
   const getFilteredTodos = () => {
     switch (filter) {
@@ -42,6 +68,12 @@ const Index = () => {
           <div className="text-center mb-12">
             <div className="flex justify-end mb-4">
               <div className="flex items-center gap-4">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={avatarUrl || undefined} />
+                  <AvatarFallback>
+                    <User className="h-4 w-4" />
+                  </AvatarFallback>
+                </Avatar>
                 <span className="text-sm text-muted-foreground">{user?.email}</span>
                 <Button
                   variant="outline"
