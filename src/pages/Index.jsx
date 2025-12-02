@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { TodoInput } from '@/components/TodoInput';
 import { TodoList } from '@/components/TodoList';
 import { FilterBar } from '@/components/FilterBar';
-import { CheckSquare, LogOut } from 'lucide-react';
+import { Profile } from '@/components/Profile';
+import { CheckSquare, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTodos } from '@/hooks/useTodos';
 import { PageTransition } from '@/components/PageTransition';
@@ -65,29 +67,48 @@ const Index = () => {
 
           {/* Main Content */}
           <div className="bg-card/50 backdrop-blur-sm rounded-2xl shadow-lg border border-border p-6 md:p-8">
-            <TodoInput onAdd={addTodo} />
-            
-            {todos.length > 0 && (
-              <FilterBar
-                currentFilter={filter}
-                onFilterChange={setFilter}
-                stats={stats}
-              />
-            )}
+            <Tabs defaultValue="todos" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="todos" className="flex items-center gap-2">
+                  <CheckSquare className="h-4 w-4" />
+                  Todos
+                </TabsTrigger>
+                <TabsTrigger value="profile" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Profile
+                </TabsTrigger>
+              </TabsList>
 
-            {loading ? (
-              <div className="text-center py-16">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              </div>
-            ) : (
-            <TodoList
-              todos={filteredTodos}
-              onToggle={toggleTodo}
-              onDelete={deleteTodo}
-              onEdit={editTodo}
-              onReorder={reorderTodos}
-            />
-            )}
+              <TabsContent value="todos" className="space-y-6">
+                <TodoInput onAdd={addTodo} />
+                
+                {todos.length > 0 && (
+                  <FilterBar
+                    currentFilter={filter}
+                    onFilterChange={setFilter}
+                    stats={stats}
+                  />
+                )}
+
+                {loading ? (
+                  <div className="text-center py-16">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                  </div>
+                ) : (
+                <TodoList
+                  todos={filteredTodos}
+                  onToggle={toggleTodo}
+                  onDelete={deleteTodo}
+                  onEdit={editTodo}
+                  onReorder={reorderTodos}
+                />
+                )}
+              </TabsContent>
+
+              <TabsContent value="profile">
+                <Profile />
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Footer */}
