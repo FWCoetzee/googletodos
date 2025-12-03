@@ -297,7 +297,7 @@ const Index = () => {
           {/* Main Content */}
           <div className="bg-card/50 backdrop-blur-sm rounded-2xl shadow-lg border border-border p-6 md:p-8">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="inline-flex mx-auto mb-6">
                 <TabsTrigger value="todos" className="flex items-center gap-2">
                   <CheckSquare className="h-4 w-4" />
                   Todos
