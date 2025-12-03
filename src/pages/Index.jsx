@@ -18,6 +18,7 @@ const Index = () => {
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('todos');
   const { user, signOut } = useAuth();
 
   useEffect(() => {
@@ -236,7 +237,10 @@ const Index = () => {
 
             {/* Prominent Avatar Section */}
             <div className="flex flex-col items-center mb-6">
-              <Avatar className="h-24 w-24 ring-4 ring-primary/20 shadow-lg mb-3">
+              <Avatar 
+                className="h-24 w-24 ring-4 ring-primary/20 shadow-lg mb-3 cursor-pointer hover:ring-primary/40 transition-all"
+                onClick={() => setActiveTab('profile')}
+              >
                 <AvatarImage src={avatarUrl || undefined} className="object-cover" />
                 <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-2xl">
                   <User className="h-10 w-10" />
@@ -258,7 +262,7 @@ const Index = () => {
 
           {/* Main Content */}
           <div className="bg-card/50 backdrop-blur-sm rounded-2xl shadow-lg border border-border p-6 md:p-8">
-            <Tabs defaultValue="todos" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="todos" className="flex items-center gap-2">
                   <CheckSquare className="h-4 w-4" />
