@@ -42,6 +42,31 @@ const Index = () => {
     };
 
     loadAvatar();
+
+    // Real-time subscription for avatar updates
+    if (!user) return;
+    
+    const channel = supabase
+      .channel('avatar-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`
+        },
+        (payload) => {
+          if (payload.new?.avatar_url !== undefined) {
+            setAvatarUrl(payload.new.avatar_url);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   // Fetch todos from database
