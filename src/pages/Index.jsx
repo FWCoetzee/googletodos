@@ -4,6 +4,7 @@ import { TodoList } from '@/components/TodoList';
 import { FilterBar } from '@/components/FilterBar';
 import { Profile } from '@/components/Profile';
 import { CheckSquare, LogOut, User } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -16,6 +17,7 @@ import { todoSchema } from '@/lib/validations';
 const Index = () => {
   const [filter, setFilter] = useState('all');
   const [avatarUrl, setAvatarUrl] = useState(null);
+  const [avatarLoading, setAvatarLoading] = useState(true);
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('todos');
@@ -25,6 +27,7 @@ const Index = () => {
     const loadAvatar = async () => {
       if (!user) return;
       
+      setAvatarLoading(true);
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -38,6 +41,8 @@ const Index = () => {
         }
       } catch (error) {
         console.error('Error loading avatar:', error.message);
+      } finally {
+        setAvatarLoading(false);
       }
     };
 
@@ -262,15 +267,19 @@ const Index = () => {
 
             {/* Prominent Avatar Section */}
             <div className="flex flex-col items-center mb-6">
-              <Avatar 
-                className="h-24 w-24 ring-4 ring-primary/20 shadow-lg mb-3 cursor-pointer hover:ring-primary/40 transition-all"
-                onClick={() => setActiveTab('profile')}
-              >
-                <AvatarImage src={avatarUrl || undefined} className="object-cover" />
-                <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-2xl">
-                  <User className="h-10 w-10" />
-                </AvatarFallback>
-              </Avatar>
+              {avatarLoading ? (
+                <Skeleton className="h-24 w-24 rounded-full mb-3" />
+              ) : (
+                <Avatar 
+                  className="h-24 w-24 ring-4 ring-primary/20 shadow-lg mb-3 cursor-pointer hover:ring-primary/40 transition-all"
+                  onClick={() => setActiveTab('profile')}
+                >
+                  <AvatarImage src={avatarUrl || undefined} className="object-cover" />
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-2xl">
+                    <User className="h-10 w-10" />
+                  </AvatarFallback>
+                </Avatar>
+              )}
               <p className="text-muted-foreground text-sm">{user?.email}</p>
             </div>
 
