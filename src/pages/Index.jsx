@@ -221,26 +221,30 @@ const Index = () => {
         <div className="container max-w-3xl mx-auto px-4 py-12">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="flex justify-end mb-4">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={avatarUrl || undefined} />
-                  <AvatarFallback>
-                    <User className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm text-muted-foreground">{user?.email}</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={signOut}
-                  className="gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
-              </div>
+            {/* Logout button */}
+            <div className="flex justify-end mb-6">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={signOut}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
             </div>
+
+            {/* Prominent Avatar Section */}
+            <div className="flex flex-col items-center mb-6">
+              <Avatar className="h-24 w-24 ring-4 ring-primary/20 shadow-lg mb-3">
+                <AvatarImage src={avatarUrl || undefined} className="object-cover" />
+                <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground text-2xl">
+                  <User className="h-10 w-10" />
+                </AvatarFallback>
+              </Avatar>
+              <p className="text-muted-foreground text-sm">{user?.email}</p>
+            </div>
+
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-glow mb-4">
               <CheckSquare className="h-8 w-8 text-primary-foreground" />
             </div>
