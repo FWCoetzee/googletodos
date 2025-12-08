@@ -103,7 +103,7 @@ const Index = () => {
     }
   }, [user]);
 
-  const addTodo = async (task) => {
+  const addTodo = async (task, dueDate = null) => {
     if (!user) return;
 
     // Server-side validation
@@ -117,7 +117,12 @@ const Index = () => {
     try {
       const { data, error } = await supabase
         .from('todos')
-        .insert([{ task: result.data.task, user_id: user.id, completed: false }])
+        .insert([{ 
+          task: result.data.task, 
+          user_id: user.id, 
+          completed: false,
+          due_date: dueDate ? dueDate.toISOString() : null
+        }])
         .select()
         .single();
 
@@ -168,7 +173,7 @@ const Index = () => {
     }
   };
 
-  const editTodo = async (id, newTask) => {
+  const editTodo = async (id, newTask, newDueDate = undefined) => {
     // Server-side validation
     const result = todoSchema.safeParse({ task: newTask });
     if (!result.success) {
@@ -178,13 +183,18 @@ const Index = () => {
     }
 
     try {
+      const updateData = { task: result.data.task };
+      if (newDueDate !== undefined) {
+        updateData.due_date = newDueDate ? newDueDate.toISOString() : null;
+      }
+
       const { error } = await supabase
         .from('todos')
-        .update({ task: result.data.task })
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;
-      setTodos(todos.map((t) => (t.id === id ? { ...t, task: result.data.task } : t)));
+      setTodos(todos.map((t) => (t.id === id ? { ...t, ...updateData } : t)));
       toast.success('Task updated!');
     } catch (error) {
       toast.error('Failed to update task');

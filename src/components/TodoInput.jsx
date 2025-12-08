@@ -1,12 +1,18 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, CalendarIcon, X } from 'lucide-react';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { todoSchema } from '@/lib/validations';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 export const TodoInput = ({ onAdd }) => {
   const [task, setTask] = useState('');
+  const [dueDate, setDueDate] = useState(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,8 +25,9 @@ export const TodoInput = ({ onAdd }) => {
       return;
     }
     
-    onAdd(result.data.task);
+    onAdd(result.data.task, dueDate);
     setTask('');
+    setDueDate(null);
   };
 
   return (
@@ -32,6 +39,51 @@ export const TodoInput = ({ onAdd }) => {
         onChange={(e) => setTask(e.target.value)}
         className="flex-1 h-12 text-base shadow-sm border-border focus-visible:ring-primary"
       />
+      <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            className={cn(
+              "h-12 px-3 gap-2",
+              dueDate && "text-primary border-primary"
+            )}
+          >
+            <CalendarIcon className="h-4 w-4" />
+            {dueDate ? format(dueDate, 'MMM d') : <span className="hidden sm:inline">Due</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="end">
+          <Calendar
+            mode="single"
+            selected={dueDate}
+            onSelect={(date) => {
+              setDueDate(date);
+              setCalendarOpen(false);
+            }}
+            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+            initialFocus
+            className="p-3 pointer-events-auto"
+          />
+          {dueDate && (
+            <div className="p-2 border-t border-border">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-full text-muted-foreground"
+                onClick={() => {
+                  setDueDate(null);
+                  setCalendarOpen(false);
+                }}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Clear date
+              </Button>
+            </div>
+          )}
+        </PopoverContent>
+      </Popover>
       <Button 
         type="submit" 
         size="lg"
