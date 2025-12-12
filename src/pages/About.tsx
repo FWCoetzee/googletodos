@@ -3,6 +3,7 @@ import { PageTransition } from '@/components/PageTransition';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Github, Linkedin, Mail } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import franklinPhoto from '@/assets/franklin-photo.jpg';
 
 const About = () => {
   return (
@@ -25,7 +26,7 @@ const About = () => {
               {/* Profile photo */}
               <Avatar className="h-32 w-32 ring-4 ring-primary/20 shadow-lg mb-6">
                 <AvatarImage 
-                  src="/franklin-photo.jpg" 
+                  src={franklinPhoto} 
                   alt="Franklin Coetzee"
                   className="object-cover"
                 />
