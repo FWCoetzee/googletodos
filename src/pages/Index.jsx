@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { TodoInput } from '@/components/TodoInput';
 import { TodoList } from '@/components/TodoList';
 import { FilterBar } from '@/components/FilterBar';
 import { Profile } from '@/components/Profile';
-import { CheckSquare, LogOut, User } from 'lucide-react';
+import { CheckSquare, LogOut, User, Info } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -267,7 +268,17 @@ const Index = () => {
           {/* Header */}
           <div className="text-center mb-12">
             {/* Logout button */}
-            <div className="flex justify-end mb-6">
+            <div className="flex justify-end gap-2 mb-6">
+              <Link to="/about">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <Info className="h-4 w-4" />
+                  About
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 size="sm"
