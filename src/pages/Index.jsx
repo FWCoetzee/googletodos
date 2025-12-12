@@ -13,6 +13,7 @@ import { PageTransition } from '@/components/PageTransition';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { todoSchema } from '@/lib/validations';
+import { useDueDateReminders } from '@/hooks/useDueDateReminders';
 
 const Index = () => {
   const [filter, setFilter] = useState('all');
@@ -22,6 +23,9 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('todos');
   const { user, signOut } = useAuth();
+
+  // Show toast reminders for tasks due today/tomorrow
+  useDueDateReminders(todos, loading);
 
   useEffect(() => {
     const loadAvatar = async () => {
