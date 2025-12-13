@@ -64,17 +64,17 @@ const About = () => {
               {/* Social links */}
               <div className="flex gap-4 mt-8">
                 <Button variant="outline" size="icon" asChild>
-                  <a href="mailto:contact@example.com" aria-label="Email">
+                  <a href="mailto:salazar3593@gmail.com" aria-label="Email">
                     <Mail className="h-5 w-5" />
                   </a>
                 </Button>
                 <Button variant="outline" size="icon" asChild>
-                  <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                  <a href="https://github.com/fwcoetzee" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                     <Github className="h-5 w-5" />
                   </a>
                 </Button>
                 <Button variant="outline" size="icon" asChild>
-                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                  <a href="https://linkedin.com/in/franklincoetzee1985" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                     <Linkedin className="h-5 w-5" />
                   </a>
                 </Button>
