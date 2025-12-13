@@ -3,6 +3,7 @@ import { PageTransition } from '@/components/PageTransition';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Github, Linkedin, Mail } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ContactForm } from '@/components/ContactForm';
 import franklinPhoto from '@/assets/franklin-photo.jpg';
 
 const About = () => {
@@ -80,6 +81,15 @@ const About = () => {
                 </Button>
               </div>
             </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="bg-card/50 backdrop-blur-sm rounded-2xl shadow-lg border border-border p-8 md:p-12 mt-8">
+            <h2 className="text-2xl font-bold mb-2 text-center">Get in Touch</h2>
+            <p className="text-muted-foreground text-center mb-6">
+              Have a question or want to work together? Send me a message!
+            </p>
+            <ContactForm />
           </div>
 
           {/* Footer */}
