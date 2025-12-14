@@ -44,6 +44,7 @@ export type Database = {
           created_at: string
           due_date: string | null
           id: string
+          position: number | null
           task: string
           user_id: string
         }
@@ -52,6 +53,7 @@ export type Database = {
           created_at?: string
           due_date?: string | null
           id?: string
+          position?: number | null
           task: string
           user_id: string
         }
@@ -60,6 +62,7 @@ export type Database = {
           created_at?: string
           due_date?: string | null
           id?: string
+          position?: number | null
           task?: string
           user_id?: string
         }
