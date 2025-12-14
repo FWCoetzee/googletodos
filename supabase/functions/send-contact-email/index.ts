@@ -1,9 +1,22 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+// Allowed origins for CORS - restrict to your domains
+const ALLOWED_ORIGINS = [
+  "https://mhgchblqmriatpmpapqw.lovable.app",
+  "https://franklincoetzee.lovable.app",
+  "http://localhost:5173",
+  "http://localhost:8080",
+];
+
+const getCorsHeaders = (origin: string | null) => {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) 
+    ? origin 
+    : ALLOWED_ORIGINS[0];
+  
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
 };
 
 interface ContactEmailRequest {
@@ -13,6 +26,9 @@ interface ContactEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -62,7 +78,8 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Email sent successfully:", data);
 
     if (!res.ok) {
-      throw new Error(data.message || "Failed to send email");
+      console.error("Resend API error:", data);
+      throw new Error("Email service error");
     }
 
     return new Response(JSON.stringify({ success: true }), {
@@ -71,11 +88,13 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: any) {
     console.error("Error in send-contact-email function:", error);
+    
+    // Return generic error message to client - details logged server-side
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Failed to send message. Please try again later." }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        headers: { "Content-Type": "application/json", ...getCorsHeaders(req.headers.get("origin")) },
       }
     );
   }
