@@ -83,6 +83,19 @@ const About = () => {
             </div>
           </div>
 
+          {/* Portfolio Section */}
+          <div className="bg-card/50 backdrop-blur-sm rounded-2xl shadow-lg border border-border p-8 md:p-12 mt-8 text-center">
+            <h2 className="text-2xl font-bold mb-2">My Portfolio</h2>
+            <p className="text-muted-foreground mb-6">
+              Check out my latest projects and work samples.
+            </p>
+            <Button asChild>
+              <a href="https://franklincoetzee.lovable.app" target="_blank" rel="noopener noreferrer">
+                View Portfolio
+              </a>
+            </Button>
+          </div>
+
           {/* Contact Form */}
           <div className="bg-card/50 backdrop-blur-sm rounded-2xl shadow-lg border border-border p-8 md:p-12 mt-8">
             <h2 className="text-2xl font-bold mb-2 text-center">Get in Touch</h2>
