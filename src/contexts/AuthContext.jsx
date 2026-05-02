@@ -109,6 +109,8 @@ export const AuthProvider = ({ children }) => {
     user,
     session,
     loading,
+    error,
+    retryAuth: initializeAuth,
     signUp,
     signIn,
     signOut,
