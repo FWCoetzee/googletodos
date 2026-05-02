@@ -17,6 +17,24 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const initializeAuth = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      setSession(session);
+      setUser(session?.user ?? null);
+    } catch (err) {
+      setError(err?.message || 'Failed to verify your session.');
+      setSession(null);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener
@@ -32,23 +50,12 @@ export const AuthProvider = ({ children }) => {
           setSession(session);
           setUser(session?.user ?? null);
         }
+        setError(null);
         setLoading(false);
       }
     );
 
-    // Check for existing session and handle errors
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        // Clear invalid session
-        supabase.auth.signOut();
-        setSession(null);
-        setUser(null);
-      } else {
-        setSession(session);
-        setUser(session?.user ?? null);
-      }
-      setLoading(false);
-    });
+    initializeAuth();
 
     return () => subscription.unsubscribe();
   }, []);
@@ -102,6 +109,8 @@ export const AuthProvider = ({ children }) => {
     user,
     session,
     loading,
+    error,
+    retryAuth: initializeAuth,
     signUp,
     signIn,
     signOut,
