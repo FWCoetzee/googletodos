@@ -71,10 +71,11 @@ describe("sanitizeRedirect", () => {
       expect(sanitizeRedirect("about")).toBe("/");
       expect(sanitizeRedirect("./about")).toBe("/");
     });
-    it("rejects values with control characters", () => {
-      expect(sanitizeRedirect("/about\n")).toBe("/");
-      expect(sanitizeRedirect("/about\t")).toBe("/");
+    it("rejects values with embedded control characters", () => {
+      expect(sanitizeRedirect("/about\nfoo")).toBe("/");
+      expect(sanitizeRedirect("/ab\tout")).toBe("/");
       expect(sanitizeRedirect("/ab out")).toBe("/");
+      expect(sanitizeRedirect("/about\x01")).toBe("/");
     });
     it("returns / when decodeURIComponent throws", () => {
       expect(sanitizeRedirect("%E0%A4%A")).toBe("/");
