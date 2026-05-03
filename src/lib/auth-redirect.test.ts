@@ -102,4 +102,66 @@ describe("sanitizeRedirect", () => {
       expect(sanitizeRedirect("  /contact  ")).toBe("/contact");
     });
   });
+
+  describe("hash fragments", () => {
+    it("preserves hash on allowed paths", () => {
+      expect(sanitizeRedirect("/about#section")).toBe("/about#section");
+      expect(sanitizeRedirect("/contact#form")).toBe("/contact#form");
+    });
+    it("preserves combined query and hash on allowed paths", () => {
+      expect(sanitizeRedirect("/about?ref=signup#top")).toBe(
+        "/about?ref=signup#top"
+      );
+    });
+    it("rejects hash on disallowed paths", () => {
+      expect(sanitizeRedirect("/admin#section")).toBe("/");
+    });
+    it("rejects hash that loops back to /auth", () => {
+      expect(sanitizeRedirect("/auth#callback")).toBe("/");
+    });
+  });
+
+  describe("mixed encoded characters", () => {
+    it("decodes encoded slash in path", () => {
+      expect(sanitizeRedirect("%2Fcontact")).toBe("/contact");
+    });
+    it("accepts lowercase percent-encoding", () => {
+      expect(sanitizeRedirect("%2fabout")).toBe("/about");
+    });
+    it("decodes encoded query separator and preserves it", () => {
+      expect(sanitizeRedirect("/about%3Fref=signup")).toBe(
+        "/about?ref=signup"
+      );
+    });
+    it("decodes encoded hash separator and preserves it", () => {
+      expect(sanitizeRedirect("/about%23section")).toBe("/about#section");
+    });
+    it("rejects when encoded value resolves to an external URL", () => {
+      // "https%3A%2F%2Fevil.com" decodes to "https://evil.com"
+      expect(sanitizeRedirect("https%3A%2F%2Fevil.com")).toBe("/");
+    });
+    it("rejects when encoded value resolves to a protocol-relative URL", () => {
+      // "%2F%2Fevil.com" decodes to "//evil.com"
+      expect(sanitizeRedirect("%2F%2Fevil.com")).toBe("/");
+    });
+  });
+
+  describe("double-encoding", () => {
+    it("does not recursively decode an allowed path", () => {
+      // "%252Fabout" decodes once to "%2Fabout" which does not start with "/"
+      expect(sanitizeRedirect("%252Fabout")).toBe("/");
+    });
+    it("does not let double-encoding bypass the /auth loop guard", () => {
+      // "%252Fauth" decodes once to "%2Fauth" → does not start with "/"
+      expect(sanitizeRedirect("%252Fauth")).toBe("/");
+    });
+    it("does not let double-encoding bypass external URL rejection", () => {
+      // Decodes once to "https%3A%2F%2Fevil.com" which still does not start with "/"
+      expect(sanitizeRedirect("https%253A%252F%252Fevil.com")).toBe("/");
+    });
+    it("rejects malformed double-encoded values", () => {
+      // Invalid percent-encoding causes decodeURIComponent to throw
+      expect(sanitizeRedirect("%%2Fabout")).toBe("/");
+    });
+  });
 });
