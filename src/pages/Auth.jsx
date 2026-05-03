@@ -59,7 +59,7 @@ const Auth = () => {
     setIsLoading(false);
 
     if (!error) {
-      navigate('/');
+      navigate(safeRedirect, { replace: true });
     }
   };
 
