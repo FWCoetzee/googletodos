@@ -23,8 +23,7 @@ const Auth = () => {
   const { signUp, signIn, user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/';
-  const safeRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/';
+  const safeRedirect = sanitizeRedirect(searchParams.get('redirect'));
 
   useEffect(() => {
     if (user) {
