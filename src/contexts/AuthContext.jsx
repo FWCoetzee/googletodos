@@ -37,23 +37,60 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    let hadSession = false;
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'TOKEN_REFRESHED') {
+          if (!session) {
+            // Refresh failed → session expired
+            handleSessionExpired();
+            return;
+          }
           setSession(session);
           setUser(session?.user ?? null);
+          hadSession = true;
         } else if (event === 'SIGNED_OUT') {
           setSession(null);
           setUser(null);
+          if (hadSession) {
+            // Unexpected sign-out (likely expiry) while user was active
+            const protectedPaths = ['/', '/about', '/contact'];
+            if (protectedPaths.includes(window.location.pathname)) {
+              toast.info('Your session has expired. Please sign in again.');
+              window.location.href = '/auth';
+            }
+          }
+          hadSession = false;
         } else {
           setSession(session);
           setUser(session?.user ?? null);
+          if (session) hadSession = true;
         }
         setError(null);
         setLoading(false);
       }
     );
+
+    const handleSessionExpired = async () => {
+      setSession(null);
+      setUser(null);
+      setLoading(false);
+      try {
+        await supabase.auth.signOut();
+      } catch (_) {
+        // ignore
+      }
+      toast.info('Your session has expired. Please sign in again.', {
+        description: 'You have been signed out automatically.',
+      });
+      const protectedPaths = ['/', '/about', '/contact'];
+      if (protectedPaths.includes(window.location.pathname)) {
+        window.location.href = '/auth';
+      }
+      hadSession = false;
+    };
 
     initializeAuth();
 
