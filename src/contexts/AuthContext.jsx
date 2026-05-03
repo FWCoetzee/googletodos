@@ -88,7 +88,8 @@ export const AuthProvider = ({ children }) => {
       });
       const protectedPaths = ['/', '/about', '/contact'];
       if (protectedPaths.includes(window.location.pathname)) {
-        window.location.href = '/auth';
+        const redirect = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/auth?redirect=${redirect}`;
       }
       hadSession = false;
     };
