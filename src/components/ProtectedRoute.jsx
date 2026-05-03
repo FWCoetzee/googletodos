@@ -6,6 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export const ProtectedRoute = ({ children }) => {
   const { user, loading, error, retryAuth } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
