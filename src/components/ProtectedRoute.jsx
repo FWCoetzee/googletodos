@@ -57,7 +57,8 @@ export const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    const redirect = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/auth?redirect=${redirect}`} replace />;
   }
 
   return children;
