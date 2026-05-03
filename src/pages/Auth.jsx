@@ -21,12 +21,15 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/';
+  const safeRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/';
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate(safeRedirect, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, safeRedirect]);
 
   const validateForm = () => {
     try {
