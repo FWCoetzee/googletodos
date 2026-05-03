@@ -45,7 +45,7 @@ export const ProtectedRoute = ({ children }) => {
               Try again
             </Button>
             <Button asChild variant="outline" className="flex-1 gap-2">
-              <a href="/auth">
+              <a href={`/auth?redirect=${encodeURIComponent(location.pathname + location.search)}`}>
                 <LogIn className="h-4 w-4" />
                 Go to login
               </a>
