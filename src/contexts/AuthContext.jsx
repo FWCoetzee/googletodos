@@ -58,8 +58,9 @@ export const AuthProvider = ({ children }) => {
             // Unexpected sign-out (likely expiry) while user was active
             const protectedPaths = ['/', '/about', '/contact'];
             if (protectedPaths.includes(window.location.pathname)) {
+              const redirect = encodeURIComponent(window.location.pathname + window.location.search);
               toast.info('Your session has expired. Please sign in again.');
-              window.location.href = '/auth';
+              window.location.href = `/auth?redirect=${redirect}`;
             }
           }
           hadSession = false;
@@ -87,7 +88,8 @@ export const AuthProvider = ({ children }) => {
       });
       const protectedPaths = ['/', '/about', '/contact'];
       if (protectedPaths.includes(window.location.pathname)) {
-        window.location.href = '/auth';
+        const redirect = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/auth?redirect=${redirect}`;
       }
       hadSession = false;
     };

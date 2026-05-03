@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { Loader2, AlertCircle, RefreshCw, LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export const ProtectedRoute = ({ children }) => {
   const { user, loading, error, retryAuth } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -44,7 +45,7 @@ export const ProtectedRoute = ({ children }) => {
               Try again
             </Button>
             <Button asChild variant="outline" className="flex-1 gap-2">
-              <a href="/auth">
+              <a href={`/auth?redirect=${encodeURIComponent(location.pathname + location.search)}`}>
                 <LogIn className="h-4 w-4" />
                 Go to login
               </a>
@@ -56,7 +57,8 @@ export const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    const redirect = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/auth?redirect=${redirect}`} replace />;
   }
 
   return children;

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,12 +21,15 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/';
+  const safeRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/';
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate(safeRedirect, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, safeRedirect]);
 
   const validateForm = () => {
     try {
@@ -56,7 +59,7 @@ const Auth = () => {
     setIsLoading(false);
 
     if (!error) {
-      navigate('/');
+      navigate(safeRedirect, { replace: true });
     }
   };
 
