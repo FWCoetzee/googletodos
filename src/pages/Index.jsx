@@ -15,11 +15,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { todoSchema } from '@/lib/validations';
 import { useDueDateReminders } from '@/hooks/useDueDateReminders';
+import { useUserAvatar } from '@/hooks/useUserAvatar';
 
 const Index = () => {
   const [filter, setFilter] = useState('all');
-  const [avatarUrl, setAvatarUrl] = useState(null);
-  const [avatarLoading, setAvatarLoading] = useState(true);
+  const { avatarUrl, loading: avatarLoading } = useUserAvatar();
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('todos');
