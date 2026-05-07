@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 // Allowed origins for CORS - restrict to your domains
 const ALLOWED_ORIGINS = [
@@ -35,7 +36,32 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, message }: ContactEmailRequest = await req.json();
+    // Require authenticated caller (defence-in-depth alongside ProtectedRoute)
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    const body = await req.json();
+    const name = typeof body?.name === "string" ? body.name.trim() : "";
+    const email = typeof body?.email === "string" ? body.email.trim() : "";
+    const message = typeof body?.message === "string" ? body.message.trim() : "";
 
     const escapeHtml = (text: string): string => {
       const map: Record<string, string> = {
@@ -48,12 +74,18 @@ const handler = async (req: Request): Promise<Response> => {
       return text.replace(/[&<>"']/g, (c) => map[c]);
     };
 
-    console.log("Received contact form submission:", { name, email });
+    console.log("Received contact form submission:", { email });
 
-    // Validate inputs
-    if (!name || !email || !message) {
+    // Server-side validation: presence, length, and email format
+    const MAX_NAME = 100, MAX_EMAIL = 255, MAX_MSG = 1000;
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (
+      !name || name.length > MAX_NAME ||
+      !email || email.length > MAX_EMAIL || !emailRe.test(email) ||
+      !message || message.length > MAX_MSG
+    ) {
       return new Response(
-        JSON.stringify({ error: "Name, email, and message are required" }),
+        JSON.stringify({ error: "Invalid input" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json", ...corsHeaders },
