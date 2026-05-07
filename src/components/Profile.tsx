@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { Upload, User } from 'lucide-react';
 
@@ -12,6 +13,7 @@ export const Profile = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [email, setEmail] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
@@ -70,6 +72,7 @@ export const Profile = () => {
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploading(true);
+      setUploadProgress(0);
 
       if (!event.target.files || event.target.files.length === 0) {
         throw new Error('You must select an image to upload.');
@@ -107,11 +110,33 @@ export const Profile = () => {
       const fileExt = ALLOWED_EXTS[file.type];
       const filePath = `${user?.id}/${crypto.randomUUID()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      // Get a signed upload URL so we can stream via XHR for progress events
+      const { data: signed, error: signError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file);
+        .createSignedUploadUrl(filePath);
 
-      if (uploadError) throw uploadError;
+      if (signError || !signed) throw signError ?? new Error('Could not start upload.');
+
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', signed.signedUrl, true);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            setUploadProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            setUploadProgress(100);
+            resolve();
+          } else {
+            reject(new Error(`Upload failed (${xhr.status})`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Network error during upload.'));
+        xhr.send(file);
+      });
 
       const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
 
@@ -121,6 +146,7 @@ export const Profile = () => {
       toast.error(error.message);
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -160,6 +186,15 @@ export const Profile = () => {
             disabled={uploading}
           />
         </Label>
+
+        {uploading && (
+          <div className="w-full space-y-1" role="status" aria-live="polite">
+            <Progress value={uploadProgress} />
+            <p className="text-xs text-center text-muted-foreground">
+              Uploading… {uploadProgress}%
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
