@@ -3,6 +3,7 @@ import { PageTransition } from '@/components/PageTransition';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { ContactForm } from '@/components/ContactForm';
+import { UserAvatarBadge } from '@/components/UserAvatarBadge';
 
 const Contact = () => {
   return (
@@ -10,13 +11,14 @@ const Contact = () => {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
         <div className="container max-w-3xl mx-auto px-4 py-12">
           {/* Back button */}
-          <div className="mb-8">
+          <div className="mb-8 flex items-center justify-between">
             <Link to="/about">
               <Button variant="ghost" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Back to About
               </Button>
             </Link>
+            <UserAvatarBadge />
           </div>
 
           {/* Contact Form */}

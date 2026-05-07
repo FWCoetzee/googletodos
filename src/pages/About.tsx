@@ -3,6 +3,7 @@ import { PageTransition } from '@/components/PageTransition';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Github, Linkedin, Mail, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { UserAvatarBadge } from '@/components/UserAvatarBadge';
 import franklinPhoto from '@/assets/franklin-photo.jpg';
 
 const About = () => {
@@ -11,13 +12,14 @@ const About = () => {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
         <div className="container max-w-3xl mx-auto px-4 py-12">
           {/* Back button */}
-          <div className="mb-8">
+          <div className="mb-8 flex items-center justify-between">
             <Link to="/">
               <Button variant="ghost" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Tasks
               </Button>
             </Link>
+            <UserAvatarBadge />
           </div>
 
           {/* Main content */}

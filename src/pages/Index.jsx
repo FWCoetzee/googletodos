@@ -15,11 +15,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { todoSchema } from '@/lib/validations';
 import { useDueDateReminders } from '@/hooks/useDueDateReminders';
+import { useUserAvatar } from '@/hooks/useUserAvatar';
 
 const Index = () => {
   const [filter, setFilter] = useState('all');
-  const [avatarUrl, setAvatarUrl] = useState(null);
-  const [avatarLoading, setAvatarLoading] = useState(true);
+  const { avatarUrl, loading: avatarLoading } = useUserAvatar();
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('todos');
@@ -28,56 +28,7 @@ const Index = () => {
   // Show toast reminders for tasks due today/tomorrow
   useDueDateReminders(todos, loading);
 
-  useEffect(() => {
-    const loadAvatar = async () => {
-      if (!user) return;
-      
-      setAvatarLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('avatar_url')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (error) throw error;
-        if (data) {
-          setAvatarUrl(data.avatar_url);
-        }
-      } catch (error) {
-        console.error('Error loading avatar:', error.message);
-      } finally {
-        setAvatarLoading(false);
-      }
-    };
-
-    loadAvatar();
-
-    // Real-time subscription for avatar updates
-    if (!user) return;
-    
-    const channel = supabase
-      .channel('avatar-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'profiles',
-          filter: `id=eq.${user.id}`
-        },
-        (payload) => {
-          if (payload.new?.avatar_url !== undefined) {
-            setAvatarUrl(payload.new.avatar_url);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
+  // Avatar is provided by useUserAvatar hook (with realtime subscription).
 
   // Fetch todos from database
   const fetchTodos = async () => {
