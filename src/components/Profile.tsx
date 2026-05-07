@@ -27,13 +27,19 @@ export const Profile = () => {
         .from('profiles')
         .select('email, avatar_url')
         .eq('id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
       if (data) {
-        setEmail(data.email || '');
+        setEmail(data.email || user?.email || '');
         setAvatarUrl(data.avatar_url);
+      } else {
+        // Profile row missing — seed it so updates work
+        setEmail(user?.email || '');
+        await supabase
+          .from('profiles')
+          .insert({ id: user?.id, email: user?.email });
       }
     } catch (error: any) {
       console.error('Error loading profile:', error.message);
@@ -46,8 +52,10 @@ export const Profile = () => {
 
       const { error } = await supabase
         .from('profiles')
-        .update({ email, avatar_url: avatarUrl })
-        .eq('id', user?.id);
+        .upsert(
+          { id: user?.id, email, avatar_url: avatarUrl },
+          { onConflict: 'id' }
+        );
 
       if (error) throw error;
 
