@@ -68,8 +68,36 @@ export const Profile = () => {
       }
 
       const file = event.target.files[0];
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${user?.id}/${Math.random()}.${fileExt}`;
+
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      const ALLOWED_EXTS: Record<string, string> = {
+        'image/jpeg': 'jpg',
+        'image/png': 'png',
+        'image/webp': 'webp',
+        'image/gif': 'gif',
+      };
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        throw new Error('Only JPEG, PNG, WebP, and GIF images are allowed.');
+      }
+      const MAX_SIZE = 5 * 1024 * 1024;
+      if (file.size > MAX_SIZE) {
+        throw new Error('Image must be smaller than 5MB.');
+      }
+
+      // Delete old avatar if exists
+      if (avatarUrl) {
+        try {
+          const oldPath = avatarUrl.split('/avatars/')[1];
+          if (oldPath) {
+            await supabase.storage.from('avatars').remove([oldPath]);
+          }
+        } catch (deleteError) {
+          console.warn('Failed to delete old avatar:', deleteError);
+        }
+      }
+
+      const fileExt = ALLOWED_EXTS[file.type];
+      const filePath = `${user?.id}/${crypto.randomUUID()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
