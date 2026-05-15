@@ -8,6 +8,8 @@ import { CheckSquare } from 'lucide-react';
 import { z } from 'zod';
 import { PageTransition } from '@/components/PageTransition';
 import { sanitizeRedirect } from '@/lib/auth-redirect';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const authSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
