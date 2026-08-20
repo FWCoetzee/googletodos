@@ -3,7 +3,7 @@
 import { writeFileSync } from "fs"
 import { resolve } from "path"
 
-const BASE_URL = "https://taskflow-fusion-33.lovable.app"
+const BASE_URL = "https://googletodos.lovable.app"
 
 interface SitemapEntry {
   path: string
@@ -15,6 +15,9 @@ interface SitemapEntry {
 const entries: SitemapEntry[] = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/auth", changefreq: "monthly", priority: "0.5" },
+  { path: "/reset-password", changefreq: "yearly", priority: "0.3" },
+  { path: "/about", changefreq: "monthly", priority: "0.7" },
+  { path: "/contact", changefreq: "monthly", priority: "0.7" },
 ]
 
 function generateSitemap(entries: SitemapEntry[]) {
