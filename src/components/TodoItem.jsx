@@ -80,12 +80,14 @@ export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
         <button
           {...attributes}
           {...listeners}
+          aria-label="Drag to reorder task"
           className="flex-shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
         >
           <GripVertical className="h-5 w-5" />
         </button>
         <button
           onClick={() => onToggle(todo.id)}
+          aria-label={todo.completed ? "Mark task as not done" : "Mark task as done"}
           className={`flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
             todo.completed
               ? 'bg-success border-success shadow-sm'
@@ -115,6 +117,7 @@ export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
                     type="button"
                     variant="outline"
                     size="sm"
+                    aria-label="Pick a due date"
                     className={cn(
                       "h-9 px-3",
                       editDueDate && "text-primary border-primary"
@@ -156,6 +159,7 @@ export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
               <Button
                 size="sm"
                 onClick={handleEdit}
+                aria-label="Save task changes"
                 className="h-9 px-3"
               >
                 <Check className="h-4 w-4" />
@@ -164,6 +168,7 @@ export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
                 size="sm"
                 variant="outline"
                 onClick={handleCancel}
+                aria-label="Cancel editing"
                 className="h-9 px-3"
               >
                 <X className="h-4 w-4" />
@@ -208,6 +213,7 @@ export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
                 size="sm"
                 variant="ghost"
                 onClick={() => setIsEditing(true)}
+                aria-label="Edit task"
                 className="h-8 w-8 p-0"
               >
                 <Edit2 className="h-4 w-4" />
@@ -216,6 +222,7 @@ export const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
                 size="sm"
                 variant="ghost"
                 onClick={() => onDelete(todo.id)}
+                aria-label="Delete task"
                 className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="h-4 w-4" />

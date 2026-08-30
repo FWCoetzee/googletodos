@@ -39,7 +39,7 @@ const About = () => {
 
               {/* Name and title */}
               <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Franklin Coetzee
+                About Franklin Coetzee
               </h1>
               <p className="text-muted-foreground text-lg mb-6">Creator & Developer</p>
 
