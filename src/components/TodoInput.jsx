@@ -44,6 +44,7 @@ export const TodoInput = ({ onAdd }) => {
           <Button
             type="button"
             variant="outline"
+            aria-label="Pick a due date"
             className={cn(
               "h-12 px-3 gap-2",
               dueDate && "text-primary border-primary"
