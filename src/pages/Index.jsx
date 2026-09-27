@@ -71,6 +71,9 @@ const Index = () => {
     }
 
     try {
+      // Bot protection: invisible reCAPTCHA + per-IP rate limit
+      await verifyCaptcha('todo_create');
+
       const { data, error } = await supabase
         .from('todos')
         .insert([{ 
@@ -86,7 +89,11 @@ const Index = () => {
       setTodos([data, ...todos]);
       toast.success('Task added!');
     } catch (error) {
-      toast.error('Failed to add task');
+      // Surface rate-limit / captcha messages verbatim so users know why it failed
+      const message = error?.message?.includes('Rate limit') || error?.message?.includes('CAPTCHA') || error?.message?.includes('Too many') || error?.message?.includes('automated')
+        ? error.message
+        : 'Failed to add task';
+      toast.error(message);
       if (import.meta.env.DEV) {
         console.error('Error adding todo:', error);
       }

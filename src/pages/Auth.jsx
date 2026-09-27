@@ -8,6 +8,7 @@ import { CheckSquare } from 'lucide-react';
 import { z } from 'zod';
 import { PageTransition } from '@/components/PageTransition';
 import { sanitizeRedirect } from '@/lib/auth-redirect';
+import { verifyCaptcha } from '@/lib/recaptcha';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
@@ -106,6 +107,18 @@ const Auth = () => {
     }
 
     setIsLoading(true);
+
+    // Bot protection: invisible reCAPTCHA + server-side rate limit on sign-up
+    if (isSignUp) {
+      try {
+        await verifyCaptcha('signup');
+      } catch (captchaError) {
+        setIsLoading(false);
+        toast.error(captchaError.message || 'Bot check failed. Please try again.');
+        return;
+      }
+    }
+
     const { error } = isSignUp
       ? await signUp(email, password)
       : await signIn(email, password);
