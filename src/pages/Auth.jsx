@@ -75,6 +75,27 @@ const Auth = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    const result = await lovable.auth.signInWithOAuth('google', {
+      redirect_uri: window.location.origin,
+    });
+
+    if (result.error) {
+      setIsLoading(false);
+      toast.error(result.error.message || 'Google sign-in failed. Please try again.');
+      return;
+    }
+
+    if (result.redirected) {
+      // Browser is redirecting to Google - keep the loading state
+      return;
+    }
+
+    // Session already set - the user effect will navigate to safeRedirect
+    setIsLoading(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
