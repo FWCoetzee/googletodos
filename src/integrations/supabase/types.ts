@@ -38,6 +38,27 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_events: {
+        Row: {
+          action: string
+          created_at: string
+          event_key: string
+          id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          event_key: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          event_key?: string
+          id?: string
+        }
+        Relationships: []
+      }
       todos: {
         Row: {
           completed: boolean
@@ -73,7 +94,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_rate_limit: {
+        Args: {
+          p_action: string
+          p_event_key: string
+          p_limit: number
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
