@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { PageTransition } from '@/components/PageTransition';
 import { sanitizeRedirect } from '@/lib/auth-redirect';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 
 const authSchema = z.object({
