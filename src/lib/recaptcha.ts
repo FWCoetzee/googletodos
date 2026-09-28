@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 // reCAPTCHA v3 site key (public — safe to commit). Set after creating keys
 // at https://www.google.com/recaptcha/admin/create
-export const RECAPTCHA_SITE_KEY = 'PASTE_YOUR_RECAPTCHA_V3_SITE_KEY_HERE';
+export const RECAPTCHA_SITE_KEY = '6LdxL9EtAAAAAPatDxfUSvo-dwT3uN9ENpaSGgTw';
 
 declare global {
   interface Window {
