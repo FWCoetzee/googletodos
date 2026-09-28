@@ -14,6 +14,7 @@ import { PageTransition } from '@/components/PageTransition';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { todoSchema } from '@/lib/validations';
+import { verifyCaptcha } from '@/lib/recaptcha';
 import { useDueDateReminders } from '@/hooks/useDueDateReminders';
 import { useUserAvatar } from '@/hooks/useUserAvatar';
 
