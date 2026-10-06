@@ -4,13 +4,14 @@ import { z } from 'npm:zod@3'
 
 const BodySchema = z.object({
   token: z.string().min(1).max(4096),
-  action: z.enum(['signup', 'todo_create']),
+  action: z.enum(['signup', 'todo_create', 'contact']),
 })
 
 // Per-action rate limits: [max events, window in seconds]
 const RATE_LIMITS: Record<string, [number, number]> = {
   signup: [5, 3600],       // 5 sign-up attempts per IP per hour
   todo_create: [60, 3600], // 60 CAPTCHA-verified task creations per IP per hour
+  contact: [10, 3600],     // 10 contact messages per IP per hour
 }
 
 const MIN_SCORE = 0.5
