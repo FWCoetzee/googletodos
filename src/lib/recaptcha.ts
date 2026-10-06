@@ -42,7 +42,7 @@ export function isRecaptchaConfigured(): boolean {
  * which also enforces per-IP rate limits. Throws with a user-friendly
  * message when the check fails.
  */
-export async function verifyCaptcha(action: 'signup' | 'todo_create'): Promise<void> {
+export async function verifyCaptcha(action: 'signup' | 'todo_create' | 'contact'): Promise<void> {
   if (!isRecaptchaConfigured()) {
     throw new Error('CAPTCHA is not configured yet. Please try again later.');
   }
